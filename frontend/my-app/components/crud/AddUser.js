@@ -1,55 +1,34 @@
 import React, {useState} from 'react'
 import { Drawer , Form, Input, Button} from 'antd';
 import {addUser} from '../../routes/userRoutes';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
-const AddUser=(props)=> {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [gender, setGender]= useState('');
-  const [country, setCountry] = useState('');
+const AddUserComponent=(props)=> {
   const [apiAddResponse, setApiAddResponse]= useState([]);
 
 
-  const handleFirstNameChange = (event) => {
-    setFirstName(event.target.value);
-  }
-
-  const handleLastNameChange = (event) => {
-    setLastName(event.target.value);
-  }
-
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  }
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  }
-
-  const handlePhoneChange = (event) => {
-    setPhone(event.target.value);
-  }
-
-  const handleGenderChange = (event) => {
-    setGender(event.target.value);
-  }
-
-  const handleCountryChange = (event) => {
-    setCountry(event.target.value);
-  }
-
-  const handleCloseDrawer = () => {
-    props.handleCloseAddUser(false);
-  }
-
-  const handleSubmit = (event) => {
-     event.preventDefault();
-      props.form.validateFields((err, values) => {
-      if (!err) {
-       const queryParms = {
+  const formik = useFormik({
+    initialValues: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        phone: '',
+        gender: '',
+        country: ''
+    },
+    validationSchema:Yup.object({
+      firstName:Yup.string().required('Required firstName'),
+      email:Yup.string().required('Required'),
+      password:Yup.string().required('Required'),
+      phone:Yup.number().required('Required'),
+      gender:Yup.string().required('Required'),
+      country:Yup.string().required('Required'),
+    }),
+    onSubmit:(values)=>{
+      console.log(values)
+      const queryParms = {
        'firstName':values.firstName,
        'lastName':values.lastName,
        'email':values.email,
@@ -57,124 +36,114 @@ const AddUser=(props)=> {
        'phone':parseInt(values.phone),
        'country':values.country,
        'gender':values.gender
-    }
-    addUser(queryParms).then(response => {
-      if(response.data.message === 'SUCCESS') {
-        setApiAddResponse(response.data.data);
-        props.handleApiData(apiAddResponse, false);
-      } else {
-        alert('User already exists');
       }
+
+        addUser(queryParms).then((response)=>{
+          setApiAddResponse(response.data.data);
+          props.handleApiData(apiAddResponse, false);
+        }).catch((error)=>{
+          console.log(error);
+        })
+
     }
-    ).catch(error => {
-      alert('User already exists');
-    })
-  }
-    })
+})
+console.log(formik.errors.firstName, formik.touched.firstName)
+
+
+  const handleCloseDrawer = () => {
+    props.handleCloseAddUser(false);
   }
 
-  const {getFieldDecorator} = props.form;
-
+ 
   return (
     <div>
-        <Drawer title='Add User' width={720} visible={props.visibleValue} onClose={handleCloseDrawer}>
-
-
-<Form layout="vertical" onSubmit={handleSubmit}>
+ <Drawer title='Add User' width={720} visible={props.visibleValue} onClose={handleCloseDrawer}>
+  <form layout="vertical" onSubmit={formik.handleSubmit}>
     <Form.Item>
-      {getFieldDecorator('firstName', {
-        rules: [{ required: true, message: 'Please input your first name' }], initialValue: firstName
-      })(
         <Input
+          id="add_user_firstName"
           placeholder="First Name"
-          onChange={handleFirstNameChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.firstName}
+          onBlur={formik.handleBlur}
+        />{formik.touched.firstName && formik.errors.firstName ? (<p>{formik.errors.firstName}</p>) : null}
     </Form.Item>
 
 
     <Form.Item>
-      {getFieldDecorator('lastName', {
-        rules: [{message: 'Please input your last name!' }], initialValue: lastName
-      })(
         <Input
+          id='add_user_lastName'
           placeholder="Last Name"
-          onChange={handleLastNameChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.lastName}
+          onBlur={formik.handleBlur}
+        />{formik.touched.lastName && formik.errors.lastName ? (<p>{formik.errors.lastName}</p>) : null}
     </Form.Item>
 
 
     <Form.Item>
-      {getFieldDecorator('email', {
-        rules: [{ required: true, message: 'Please input your email!' }], initialValue: email
-      })(
         <Input
+          id='add_user_email'
           placeholder="Email"
-          onChange={handleEmailChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.email}
+          onBlur={formik.handleBlur}
+        />{formik.touched.email && formik.errors.email ? (<p>{formik.errors.email}</p>) : null}
     </Form.Item>
 
 
     <Form.Item>
-      {getFieldDecorator('password', {
-        rules: [{ required: true, message: 'Please input your password!' }], initialValue: password
-      })(
         <Input
+          id='add_user_password'
           placeholder="Password"
-          onChange={handlePasswordChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.password}
+          onBlur={formik.handleBlur}
+        />{formik.touched.password && formik.errors.password ? (<p>{formik.errors.password}</p>) : null}
     </Form.Item>
 
 
     <Form.Item>
-      {getFieldDecorator('phone', {
-        rules: [{ required: true, message: 'Please input your phone number!' }], initialValue: phone
-      })(
         <Input
+          id='add_user_phone'
           placeholder="Phone"
-          onChange={handlePhoneChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.phone}
+          onBlur={formik.handleBlur}
+        />{formik.touched.phone && formik.errors.phone ? (<p>{formik.errors.phone}</p>) : null}
     </Form.Item>
 
 
     <Form.Item>
-      {getFieldDecorator('gender', {
-        rules: [{ required: true, message: 'Please input your gender!' }], initialValue: gender
-      })(
         <Input
+          id='add_user_gender'
           placeholder="Gender"
-          onChange={handleGenderChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.gender}
+          onBlur={formik.handleBlur}
+        />{formik.touched.gender && formik.errors.gender ? (<p>{formik.errors.gender}</p>) : null}
     </Form.Item>
 
 
     <Form.Item>
-      {getFieldDecorator('country', {
-        rules: [{ required: true, message: 'Please input your email!' }], initialValue: country
-      })(
         <Input
+          id='add_user_country'
           placeholder="Country"
-          onChange={handleCountryChange}
-        />,
-      )}
+          onChange={formik.handleChange}
+          initialvalues={formik.values.country}
+          onBlur={formik.handleBlur}
+        />{formik.touched.country && formik.errors.country ? (<p>{formik.errors.country}</p>) : null}
     </Form.Item>
     <Form.Item 
-    required
     >
       <Button type="primary" htmlType="submit">
         Add User
       </Button>
     </Form.Item>
-  </Form>
+  </form>
           </Drawer>
     </div>
   )
 }
 
-const AddUserComponent = Form.create({name:'add_user'})(AddUser);
 export default AddUserComponent;

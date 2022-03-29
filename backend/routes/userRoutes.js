@@ -7,7 +7,7 @@ const router = express.Router();
 const {GET_ALL_USERS,GET_USER_BY_ID,CREATE_USER,DELETE_USER, LOGIN, UPDATE_USER} = routesPath;
 
 
-router.get(GET_ALL_USERS, getAllUser);
+router.get(GET_ALL_USERS,  getAllUser);
 router.get(GET_USER_BY_ID, getUserById);
 router.post(CREATE_USER, createUser);
 router.put(UPDATE_USER, updateUser);
